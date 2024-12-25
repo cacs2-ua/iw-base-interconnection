@@ -1,13 +1,13 @@
-# tpvv-BoarDalo: Tu Plataforma de Pago Online de Confianza
+# interconnection-BoarDalo: Tu Plataforma de Pago Online de Confianza
 
-## 💸 ¿Por Qué tpvv-BoarDalo?
+## 💸 ¿Por Qué interconnection-BoarDalo?
 
 ---
 
-tpvv-BoarDalo transforma la manera en que manejas pagos online: seguro, rápido y fácil de integrar.
+interconnection-BoarDalo transforma la manera en que manejas pagos online: seguro, rápido y fácil de integrar.
 Ofrecemos una solución confiable que se adapta a cualquier negocio,
 brindando una experiencia de pago moderna y fluida tanto para ti como para tus clientes.
-¡Con tpvv, llevas tus transacciones al siguiente nivel!
+¡Con interconnection, llevas tus transacciones al siguiente nivel!
 
 ## 💪 Componentes del equipo
 
@@ -23,7 +23,7 @@ Somos el grupo **G15** de parácticas de la asignatura de **Ingeniería Web** de
 
 ---
 
-La API de tpvv-BoarDalo es una API REST que permite realizar pagos online de forma segura y sencilla.
+La API de interconnection-BoarDalo es una API REST que permite realizar pagos online de forma segura y sencilla.
 
 ## 🚀 Levantar el Proyecto en Local
 
@@ -41,7 +41,7 @@ La API de tpvv-BoarDalo es una API REST que permite realizar pagos online de for
 1. Para levantar la base de datos de `PostgreSQL` en un contenedor de `Docker`, ejecutar el siguiente comando:
 
 ```sh
-docker run --name postgres-tpvv-develop -e POSTGRES_USER=tpvv -e POSTGRES_PASSWORD=tpvv -e POSTGRES_DB=tpvv -p 5462:5432 -d postgres:13
+docker run --name postgres-interconnection-develop -e POSTGRES_USER=interconnection -e POSTGRES_PASSWORD=interconnection -e POSTGRES_DB=interconnection -p 5462:5432 -d postgres:13
 ```
 
 2. Para ejecutar la aplicación para que se conecte a la base de datos de PostgreSQL, ejecutar el siguiente comando:
@@ -53,7 +53,7 @@ mvn spring-boot:run -D spring-boot.run.profiles=postgres
 3. Para levantar la base de datos de `PostgreSQL` para los TESTS en un contenedor de `Docker`, ejecutar el siguiente comando:
 
 ```sh
-docker run --name postgres-tpvv-test -e POSTGRES_USER=tpvv -e POSTGRES_PASSWORD=tpvv -e POSTGRES_DB=tpvv_test -p 5463:5432 -d postgres:13
+docker run --name postgres-interconnection-test -e POSTGRES_USER=interconnection -e POSTGRES_PASSWORD=interconnection -e POSTGRES_DB=tpvv_test -p 5463:5432 -d postgres:13
 ```
 
 4. Para ejecutar los tests para que se ejecuten con la base de datos de PostgreSQL, ejecutar el siguiente comando:
@@ -182,5 +182,5 @@ Una vez establecidos todos estos datos, simplemente seguid **exactamente** los m
 
 ---
 
-## Eso es todo, 🤑🤑¡A disfrutar de tpvv-BoarDalo! 🤑🤑
+## Eso es todo, 🤑🤑¡A disfrutar de interconnection-BoarDalo! 🤑🤑
 
