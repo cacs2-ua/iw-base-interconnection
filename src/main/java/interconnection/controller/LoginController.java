@@ -41,6 +41,11 @@ public class LoginController {
         return "formLogin"; // Plantilla adaptada con thymeleaf
     }
 
+    @GetMapping("/hola")
+    public String loginPene(Model model) {
+        return "checkout"; // Plantilla adaptada con thymeleaf
+    }
+
     @PostMapping("/login")
     public String loginSubmit(@ModelAttribute LoginData loginData, Model model) {
         UsuarioService.LoginStatus loginStatus = usuarioService.login(
