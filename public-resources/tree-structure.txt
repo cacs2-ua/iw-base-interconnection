@@ -1,0 +1,45 @@
+PRIVADO-TPVV-IW-Grupal2/
+├── .git/
+├── .idea/
+├── .mvn/
+├── doc/
+│   └── mock.txt
+├── public-resources/
+│   └── doc-images/
+├── sql/
+│   └── mock.txt
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── tpvv/
+│   │   │       ├── authentication/
+│   │   │       ├── config/
+│   │   │       ├── controller/
+│   │   │       ├── dto/
+│   │   │       ├── interceptor/
+│   │   │       ├── model/
+│   │   │       ├── repository/
+│   │   │       ├── security/
+│   │   │       ├── service/
+                ├── seeder/
+│   │   │       └── Application.java
+│   │   ├── resources/
+│   │   │   ├── static/
+│   │   │   │   ├── css/
+│   │   │   │   └── js/
+│   │   │   ├── templates/
+│   │   │   └── application.properties
+            └── application-postgres.properties
+│   └── test/
+│       ├── java/
+│       │   └── tpvv/
+│       │       ├── controller/
+│       │       ├── repository/
+│       │       └── service/
+│       └── resources/
+├── .gitignore
+├── Dockerfile
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+└── README.md

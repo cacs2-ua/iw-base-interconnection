@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Confirmación de Pago</title>
+  <meta charset="UTF-8" />
+</head>
+<body>
+<h1>Pago Realizado con Éxito</h1>
+<p>Detalles del Pago:</p>
+<ul>
+  <li>ID del Pago: <span th:text="${pago.id}"></span></li>
+  <li>ID del Ticket: <span th:text="${pago.ticketExt}"></span></li>
+  <li>Importe: <span th:text="${pago.importe}"></span></li>
+  <li>Fecha: <span th:text="${#dates.format(pago.fecha, 'dd/MM/yyyy HH:mm:ss')}"></span></li>
+  <li>Tarjeta: <span th:text="${pago.tarjeta}"></span></li>
+  <li>Comercio: <span th:text="${pago.comercioNombre}"></span></li>
+</ul>
+</body>
+</html>

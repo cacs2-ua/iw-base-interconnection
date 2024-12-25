@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Formulario de Pago</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+<h1>Realizar Pago</h1>
+<form th:action="@{/pago/realizar}" th:object="${pagoData}" method="post">
+    <div>
+        <label for="importe">Importe:</label>
+        <input type="text" id="importe" th:field="*{importe}" readonly />
+    </div>
+    <div>
+        <label for="ticketExt">ID del Ticket:</label>
+        <input type="text" id="ticketExt" th:field="*{ticketExt}" readonly />
+    </div>
+    <div>
+        <label for="tarjeta">Número de Tarjeta:</label>
+        <input type="text" id="tarjeta" th:field="*{tarjeta}" required />
+    </div>
+    <div>
+        <button type="submit">Realizar Pago</button>
+    </div>
+</form>
+</body>
+</html>

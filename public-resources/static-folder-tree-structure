@@ -1,0 +1,24 @@
+static
+├── css
+│   ├── bootstrap
+│   │   ├── bootstrap.css
+│   │   ├── bootstrap.rtl.css
+│   │   ├── bootstrap-grid.css
+│   │   ├── bootstrap-grid.rtl.css
+│   │   ├── bootstrap-reboot.css
+│   │   ├── bootstrap-reboot.rtl.css
+│   │   ├── bootstrap-utilities.css
+│   │   ├── bootstrap-utilities.rtl.css
+│   ├── custom
+│       └── custom-styles.css
+├── js
+│   ├── bootstrap
+│   │   ├── bootstrap.bundle.js
+│   │   ├── bootstrap.esm.js
+│   │   ├── bootstrap.js
+│   ├── custom
+│   │   ├── custom-script.js
+│   │   └── otro-script.js
+│   ├── vendor
+│       ├── jquery.min.js
+│       └── popper.min.js

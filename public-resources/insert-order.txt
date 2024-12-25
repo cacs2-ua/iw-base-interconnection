@@ -1,0 +1,17 @@
+parametros
+paises
+comercios
+personas_contacto
+tarjetas_pago
+estados_pago
+pagos
+tipos_usuario
+estados_incidencia
+incidencias
+usuarios
+valoraciones_tecnico
+mensajes
+
+
+
+
