@@ -41,7 +41,7 @@ La API de interconnection-BoarDalo es una API REST que permite realizar pagos on
 1. Para levantar la base de datos de `PostgreSQL` en un contenedor de `Docker`, ejecutar el siguiente comando:
 
 ```sh
-docker run --name postgres-interconnection-develop -e POSTGRES_USER=interconnection -e POSTGRES_PASSWORD=interconnection -e POSTGRES_DB=interconnection -p 5462:5432 -d postgres:13
+docker run --name postgres-tpvv-interconnection-develop -e POSTGRES_USER=tpvv_int -e POSTGRES_PASSWORD=tpvv_int -e POSTGRES_DB=tpvv_int -p 5562:5432 -d postgres:13
 ```
 
 2. Para ejecutar la aplicación para que se conecte a la base de datos de PostgreSQL, ejecutar el siguiente comando:
@@ -53,7 +53,7 @@ mvn spring-boot:run -D spring-boot.run.profiles=postgres
 3. Para levantar la base de datos de `PostgreSQL` para los TESTS en un contenedor de `Docker`, ejecutar el siguiente comando:
 
 ```sh
-docker run --name postgres-interconnection-test -e POSTGRES_USER=interconnection -e POSTGRES_PASSWORD=interconnection -e POSTGRES_DB=tpvv_test -p 5463:5432 -d postgres:13
+docker run --name postgres-tpvv-interconnection-test -e POSTGRES_USER=tpvv_int -e POSTGRES_PASSWORD=tpvv_int -e POSTGRES_DB=tpvv_int_test -p 5563:5432 -d postgres:13
 ```
 
 4. Para ejecutar los tests para que se ejecuten con la base de datos de PostgreSQL, ejecutar el siguiente comando:
