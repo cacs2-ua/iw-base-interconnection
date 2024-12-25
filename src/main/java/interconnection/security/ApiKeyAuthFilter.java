@@ -51,11 +51,11 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "API-Key inválida o no proporcionada");
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     return;
                 }
             } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "API-Key no proporcionada");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
         }
