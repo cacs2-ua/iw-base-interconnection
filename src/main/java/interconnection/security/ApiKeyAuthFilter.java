@@ -21,7 +21,10 @@ import java.util.Optional;
 @Component
 public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
-    private static final String API_KEY_HEADER = "X-API-KEY";
+    /**
+     * Ahora utilizamos la cabecera Authorization en lugar de X-API-KEY.
+     */
+    private static final String AUTHORIZATION_HEADER = "Authorization";
 
     @Autowired
     private ComercioRepository comercioRepository;
@@ -51,10 +54,12 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
+                    // API-Key no válida
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     return;
                 }
             } else {
+                // Falta la API-Key en la cabecera Authorization
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
@@ -65,6 +70,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
     }
 
     private String extractApiKey(HttpServletRequest request) {
-        return request.getHeader(API_KEY_HEADER);
+        return request.getHeader(AUTHORIZATION_HEADER);
     }
 }
+

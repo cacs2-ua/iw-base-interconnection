@@ -1,6 +1,5 @@
 package interconnection.controller;
 
-
 import interconnection.service.ParametroComercioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Optional;
 
 @Controller
@@ -40,12 +41,14 @@ public class StoreController {
     }
 
     /**
-     * Maneja la acción de finalizar compra y redirige al formulario de pago.
+     * Maneja la acción de finalizar compra, realiza una solicitud al servidor TPVV
+     * y devuelve el formulario de pago al usuario.
      *
-     * @return Redirección al formulario de pago en el servidor TPVV.
+     * @param model El modelo para la vista.
+     * @return La vista del formulario de pago o una página de error.
      */
     @GetMapping("/finalizarCompra")
-    public String finalizarCompra(Model model) {
+    public ResponseEntity<String> finalizarCompra(Model model) {
         String ticket = "TICKET12345";
         double precio = 99.99;
 
@@ -54,7 +57,8 @@ public class StoreController {
 
         if (apiKeyOpt.isEmpty()) {
             model.addAttribute("error", "Error: API Key no encontrada en los parámetros.");
-            return "error";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("<html><body><h1>Error</h1><p>API Key no encontrada en los parámetros.</p></body></html>");
         }
 
         String apiKey = apiKeyOpt.get();
@@ -62,6 +66,9 @@ public class StoreController {
         // Configurar los headers con la API Key
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-API-KEY", apiKey);
+        headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBasicAuth("user", "password"); // Si es necesario autenticar con usuario y contraseña
 
         // Configurar los parámetros de la solicitud
         String url = "http://localhost:8123/pago/form?importe=" + precio + "&idTicket=" + ticket;
@@ -73,16 +80,20 @@ public class StoreController {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                // Retornar el contenido HTML del formulario de pago
-                return "redirect:/tienda/pagoForm?importe=" + precio + "&idTicket=" + ticket;
+                // Devolver el contenido HTML del formulario de pago directamente al usuario
+                return ResponseEntity.ok()
+                        .contentType(MediaType.TEXT_HTML)
+                        .body(response.getBody());
             } else {
                 model.addAttribute("error", "Error al acceder al formulario de pago.");
-                return "error";
+                return ResponseEntity.status(response.getStatusCode())
+                        .body("<html><body><h1>Error</h1><p>Problema al acceder al formulario de pago.</p></body></html>");
             }
 
         } catch (Exception e) {
             model.addAttribute("error", "Error al procesar la solicitud: " + e.getMessage());
-            return "error";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("<html><body><h1>Error</h1><p>" + e.getMessage() + "</p></body></html>");
         }
     }
 }
