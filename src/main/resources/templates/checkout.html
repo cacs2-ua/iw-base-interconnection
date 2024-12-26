@@ -11,7 +11,7 @@
     <p><strong>Precio Total a Pagar:</strong> $<span th:text="${precio}">666.666</span></p>
 </div>
 <div>
-    <form th:action="@{/tienda/finalizarCompra}" method="get">
+    <form th:action="@{/tienda/pagoFormProxy}" method="get">
         <button type="submit">Finalizar compra</button>
     </form>
 </div>
