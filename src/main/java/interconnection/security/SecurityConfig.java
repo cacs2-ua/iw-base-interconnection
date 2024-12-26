@@ -19,7 +19,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/pago/**")) // Ignorar CSRF en H2 Console
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/pago/**", "/tienda/**")) // Ignorar CSRF en H2 Console
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // Permitir iframes para H2 Console
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
