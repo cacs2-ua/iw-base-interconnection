@@ -55,12 +55,12 @@ public class StoreController {
      *
      * El HTML del formulario se inyecta en paymentFormProxy.html
      * para que el usuario lo vea y lo use. Además, se REEMPLAZA la action="/pago/realizar"
-     * por action="/tienda/paymentProxy" para que el POST también vaya por proxy.
+     * por action="/tienda/realizarPagoProxy" para que el POST también vaya por proxy.
      */
-    @GetMapping("/finalizarCompra")
-    public String finalizarCompra(Model model) {
-        String ticket = "TICKET12345";
-        double precio = 99.99;
+    @GetMapping("/pagoFormProxy")
+    public String pagoFormProxy(Model model) {
+        String ticket = "TICKET-666";
+        double precio = 666.666;
 
         // 1) Recuperar la API Key desde la base de datos
         Optional<String> apiKeyOpt = parametroComercioService.getValorParametro("apiKey");
@@ -87,13 +87,13 @@ public class StoreController {
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 // 5) Reemplazar la acción del formulario para el POST
                 //    Queremos que en lugar de <form th:action="@{/pago/realizar}">
-                //    el HTML devuelto use <form action="/tienda/paymentProxy"> (o similar).
+                //    el HTML devuelto use <form action="/tienda/realizarPagoProxy"> (o similar).
                 String originalHtml = response.getBody();
-                // Sustituimos la URL original (ej. "/pago/realizar") por "/tienda/paymentProxy"
+                // Sustituimos la URL original (ej. "/pago/realizar") por "/tienda/realizarPagoProxy"
                 // Ajusta si tu form usa otra ruta o thymeleaf. Lo importante es interceptar la acción real.
                 String modificadoHtml = originalHtml.replace(
                         "/pago/realizar",
-                        "/tienda/paymentProxy"
+                        "/tienda/realizarPagoProxy"
                 );
 
                 // 6) Insertar el HTML resultante en el modelo
@@ -116,8 +116,8 @@ public class StoreController {
      * Nosotros leemos los datos del formulario (con @ModelAttribute o @RequestBody)
      * y hacemos un POST a http://localhost:8123/pago/realizar adjuntando la cabecera Authorization.
      */
-    @PostMapping("/paymentProxy")
-    public String proxyRealizarPago(@ModelAttribute("pagoData") interconnection.dto.PagoData pagoData,
+    @PostMapping("/realizarPagoProxy")
+    public String realizarPagoProxy(@ModelAttribute("pagoData") PagoData pagoData,
                                     Model model) {
         // 1) Recuperar la API Key
         Optional<String> apiKeyOpt = parametroComercioService.getValorParametro("apiKey");
@@ -133,7 +133,7 @@ public class StoreController {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // 3) Enviamos en el body un JSON con los datos de pago
-        HttpEntity<interconnection.dto.PagoData> requestEntity =
+        HttpEntity<PagoData> requestEntity =
                 new HttpEntity<>(pagoData, headers);
 
         // 4) Llamamos al /pago/realizar de TPVV
