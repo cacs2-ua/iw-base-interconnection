@@ -66,7 +66,7 @@ public class StoreController {
         Optional<String> apiKeyOpt = parametroComercioService.getValorParametro("apiKey");
         if (apiKeyOpt.isEmpty()) {
             model.addAttribute("error", "Error: API Key no encontrada en los parámetros.");
-            return "error";
+            return "error/404";
         }
         String apiKey = apiKeyOpt.get();
 
@@ -101,12 +101,12 @@ public class StoreController {
                 return "paymentFormProxy"; // Plantilla que muestra el HTML ya modificado
             } else {
                 model.addAttribute("error", "Error al acceder al formulario de pago en TPVV.");
-                return "error";
+                return "error/404";
             }
         } catch (Exception e) {
             model.addAttribute("error",
                     "Error al procesar la solicitud contra TPVV: " + e.getMessage());
-            return "error";
+            return "error/404";
         }
     }
 
@@ -123,7 +123,7 @@ public class StoreController {
         Optional<String> apiKeyOpt = parametroComercioService.getValorParametro("apiKey");
         if (apiKeyOpt.isEmpty()) {
             model.addAttribute("error", "API Key no encontrada en los parámetros.");
-            return "error";
+            return "error/404";
         }
         String apiKey = apiKeyOpt.get();
 
@@ -150,11 +150,11 @@ public class StoreController {
             } else {
                 model.addAttribute("error", "Error en la respuesta del TPVV: "
                         + response.getStatusCode());
-                return "error";
+                return "error/404";
             }
         } catch (Exception e) {
             model.addAttribute("error", "Excepción en la llamada POST al TPVV: " + e.getMessage());
-            return "error";
+            return "error/404";
         }
     }
 }
