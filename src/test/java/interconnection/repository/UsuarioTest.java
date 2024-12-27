@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@Sql(scripts = "/clean-db.sql")
+@Sql(scripts = "/sql/clean-test-db.sql")
 public class UsuarioTest {
 
     @Autowired

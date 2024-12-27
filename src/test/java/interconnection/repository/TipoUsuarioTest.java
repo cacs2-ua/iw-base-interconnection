@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@Sql(scripts = "/clean-db.sql")
+@Sql(scripts = "/sql/clean-test-db.sql")
 public class TipoUsuarioTest {
 
     @Autowired

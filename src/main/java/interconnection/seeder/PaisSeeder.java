@@ -27,7 +27,7 @@ public class PaisSeeder {
 
     @Transactional
     public void seed() {
-        // Ejecutar el script clean-db.sql para limpiar la base de datos
+        // Ejecutar el script clean-develop-db.sql para limpiar la base de datos
         executeSqlScript("clean-db.sql");
 
         // Reiniciar la secuencia de IDs
