@@ -75,7 +75,7 @@ public class StoreController {
         headers.set("Authorization", apiKey);
 
         // 3) Construir la URL al TPVV
-        String url = "http://localhost:8123/pago/form?importe=" + precio + "&idTicket=" + ticket;
+        String url = "http://localhost:8123/tpvv/boardalo/pago/form?importe=" + precio + "&idTicket=" + ticket;
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
@@ -92,7 +92,7 @@ public class StoreController {
                 // Sustituimos la URL original (ej. "/pago/realizar") por "/tienda/realizarPagoProxy"
                 // Ajusta si tu form usa otra ruta o thymeleaf. Lo importante es interceptar la acción real.
                 String modificadoHtml = originalHtml.replace(
-                        "/pago/realizar",
+                        "/tpvv/boardalo/pago/realizar",
                         "/tienda/realizarPagoProxy"
                 );
 
@@ -136,8 +136,8 @@ public class StoreController {
         HttpEntity<PagoData> requestEntity =
                 new HttpEntity<>(pagoData, headers);
 
-        // 4) Llamamos al /pago/realizar de TPVV
-        String urlTPVV = "http://localhost:8123/pago/realizar";
+        // 4) Llamamos al /pago/realizar de TPVV7
+        String urlTPVV = "http://localhost:8123/tpvv/boardalo/pago/realizar";
         try {
             ResponseEntity<String> response =
                     restTemplate.postForEntity(urlTPVV, requestEntity, String.class);
