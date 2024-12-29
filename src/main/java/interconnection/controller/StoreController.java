@@ -43,9 +43,11 @@ public class StoreController {
         // Datos hardcodeados para el ticket y el precio
         String ticket = "TICKET-666";
         double precio = 666.666;
+        String nombreComercio = "Tienda Online";
 
         model.addAttribute("ticket", ticket);
         model.addAttribute("precio", precio);
+        model.addAttribute("nombreComercio", nombreComercio);
         return "checkout";
     }
 
@@ -98,6 +100,7 @@ public class StoreController {
 
                 // 6) Insertar el HTML resultante en el modelo
                 model.addAttribute("paymentFormContent", modificadoHtml);
+                model.addAttribute("fullPage", false);
                 return "paymentFormProxy"; // Plantilla que muestra el HTML ya modificado
             } else {
                 model.addAttribute("error", "Error al acceder al formulario de pago en TPVV.");

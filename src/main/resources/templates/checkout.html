@@ -1,3 +1,8 @@
+<style>
+
+</style>
+
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -9,6 +14,7 @@
 <div>
     <p><strong>Ticket del Pedido:</strong> <span th:text="${ticket}">TICKET-666</span></p>
     <p><strong>Precio Total a Pagar:</strong> $<span th:text="${precio}">666.666</span></p>
+    <input type="hidden" name="nombreComercio" th:value="${nombreComercio}">
 </div>
 <div>
     <form th:action="@{/tienda/pagoFormProxy}" method="get">
