@@ -13,14 +13,6 @@ import java.util.Optional;
 
 /**
  * Controlador de la Tienda que actúa como 'Cliente' ante el TPVV.
- *
- * Escenario: No podemos incluir cabeceras HTTP en un redireccionamiento,
- *           así que en lugar de redirigir directamente, hacemos un proxy:
- *  1) Llamamos desde aquí al TPVV con la cabecera Authorization (GET).
- *  2) Obtenemos el HTML del formulario, pero le cambiamos la acción del <form>
- *     para que el POST se haga también contra un proxy interno de la Tienda.
- *  3) Cuando el usuario hace el POST, la Tienda vuelve a llamar al TPVV
- *     pasando la cabecera Authorization y devolviendo la respuesta final.
  */
 @Controller
 @RequestMapping("/tienda")
@@ -33,40 +25,40 @@ public class StoreController {
     private RestTemplate restTemplate;
 
     /**
-     * Muestra la página de checkout con el ticket y el precio.
+     * Muestra la página de checkout con el ticket y el precio (datos "hardcodeados" de ejemplo).
      *
      * @param model El modelo para la vista.
      * @return checkout.html
      */
     @GetMapping("/checkout")
     public String mostrarCheckout(Model model) {
-        // Datos hardcodeados para el ticket y el precio
-        String ticket = "TICKET-666";
-        double precio = 666.666;
-        String nombreComercio = "Tienda Online";
-        String fecha = "08/10/2024";
-        String hora = "12:45";
+        // Datos hardcodeados para el ejemplo
+        String ticket = "TICKET-777";
+        double precio = 777.777;
+        String nombreComercio = "Tienda Online v2";
+        String fecha = "09/09/2029";
+        String hora = "13:45";
 
         model.addAttribute("ticket", ticket);
         model.addAttribute("precio", precio);
         model.addAttribute("nombreComercio", nombreComercio);
         model.addAttribute("fecha", fecha);
         model.addAttribute("hora", hora);
+
         return "checkout";
     }
 
     /**
      * Maneja la acción de finalizar compra (GET) y obtiene via proxy
      * el formulario de pago desde la app TPVV (puerto 8123).
-     *
-     * El HTML del formulario se inyecta en paymentFormProxy.html
-     * para que el usuario lo vea y lo use. Además, se REEMPLAZA la action="/pago/realizar"
-     * por action="/tienda/realizarPagoProxy" para que el POST también vaya por proxy.
      */
     @GetMapping("/pagoFormProxy")
-    public String pagoFormProxy(Model model) {
-        String ticket = "TICKET-666";
-        double precio = 666.666;
+    public String pagoFormProxy(@RequestParam("ticket") String ticket,
+                                @RequestParam("precio") double precio,
+                                @RequestParam("nombreComercio") String nombreComercio,
+                                @RequestParam("fecha") String fecha,
+                                @RequestParam("hora") String hora,
+                                Model model) {
 
         // 1) Recuperar la API Key desde la base de datos
         Optional<String> apiKeyOpt = parametroComercioService.getValorParametro("apiKey");
@@ -81,7 +73,9 @@ public class StoreController {
         headers.set("Authorization", apiKey);
 
         // 3) Construir la URL al TPVV
-        String url = "http://localhost:8123/tpvv/boardalo/pago/form?importe=" + precio + "&idTicket=" + ticket;
+        //    Observa que enviamos importe y idTicket para que el TPVV forme "pagoData"
+        String url = "http://localhost:8123/tpvv/boardalo/pago/form?importe=" + precio
+                + "&idTicket=" + ticket;
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
@@ -91,21 +85,39 @@ public class StoreController {
                     restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                // 5) Reemplazar la acción del formulario para el POST
-                //    Queremos que en lugar de <form th:action="@{/pago/realizar}">
-                //    el HTML devuelto use <form action="/tienda/realizarPagoProxy"> (o similar).
+                // *** HTML original que viene del TPVV ***
                 String originalHtml = response.getBody();
-                // Sustituimos la URL original (ej. "/pago/realizar") por "/tienda/realizarPagoProxy"
-                // Ajusta si tu form usa otra ruta o thymeleaf. Lo importante es interceptar la acción real.
+
+                // 5) Reemplazar la acción del formulario para el POST
+                //    (de /tpvv/boardalo/pago/realizar a /tienda/realizarPagoProxy)
                 String modificadoHtml = originalHtml.replace(
                         "/tpvv/boardalo/pago/realizar",
                         "/tienda/realizarPagoProxy"
                 );
 
-                // 6) Insertar el HTML resultante en el modelo
+                // 6) Reemplazar los valores de ejemplo por los reales recibidos del checkout
+                //    Ojo: Asegúrate de que coincidan EXACTAMENTE con lo que aparece en paymentForm.html
+                //    - 218,42 €
+                //    - Paquetería
+                //    - 000000001
+                //    - 09/12/2024
+                //    - 10:46
+
+                // Si quieres formatear "precio" a 2 decimales:
+                String precioFormateado = String.format("%.2f", precio);
+
+                modificadoHtml = modificadoHtml
+                        .replace("218,42 €", precioFormateado + " €")
+                        .replace("Paquetería", nombreComercio)
+                        .replace("000000001", ticket)
+                        .replace("09/12/2024", fecha)
+                        .replace("10:46", hora);
+
+                // 7) Insertar el HTML resultante en el modelo
                 model.addAttribute("paymentFormContent", modificadoHtml);
                 model.addAttribute("fullPage", false);
-                return "paymentFormProxy"; // Plantilla que muestra el HTML ya modificado
+
+                return "paymentFormProxy"; // Plantilla que muestra el HTML inyectado
             } else {
                 model.addAttribute("error", "Error al acceder al formulario de pago en TPVV.");
                 return "error/404";
@@ -119,9 +131,7 @@ public class StoreController {
 
     /**
      * Reverse Proxy para manejar el POST de realizar pago.
-     * El formulario del TPVV (ya modificado) vendrá aquí en lugar de /pago/realizar directamente.
-     * Nosotros leemos los datos del formulario (con @ModelAttribute o @RequestBody)
-     * y hacemos un POST a http://localhost:8123/pago/realizar adjuntando la cabecera Authorization.
+     * Redirige la petición final al TPVV incluyendo la cabecera Authorization.
      */
     @PostMapping("/realizarPagoProxy")
     public String realizarPagoProxy(@ModelAttribute("pagoData") PagoData pagoData,
@@ -140,10 +150,9 @@ public class StoreController {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // 3) Enviamos en el body un JSON con los datos de pago
-        HttpEntity<PagoData> requestEntity =
-                new HttpEntity<>(pagoData, headers);
+        HttpEntity<PagoData> requestEntity = new HttpEntity<>(pagoData, headers);
 
-        // 4) Llamamos al /pago/realizar de TPVV7
+        // 4) Llamamos al /pago/realizar de TPVV
         String urlTPVV = "http://localhost:8123/tpvv/boardalo/pago/realizar";
         try {
             ResponseEntity<String> response =

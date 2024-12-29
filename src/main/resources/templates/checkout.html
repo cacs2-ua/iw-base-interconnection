@@ -1,8 +1,3 @@
-<style>
-
-</style>
-
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -18,8 +13,19 @@
     <input type="hidden" name="fecha" th:value="${fecha}">
     <input type="hidden" name="hora" th:value="${hora}">
 </div>
+
 <div>
-    <form th:action="@{/tienda/pagoFormProxy}" method="get">
+    <!-- FORM que hace un GET a /tienda/pagoFormProxy con todos los datos en QueryParams -->
+    <form th:action="@{/tienda/pagoFormProxy}"
+          method="get">
+
+        <!-- Campos ocultos para que viajen en Query Params -->
+        <input type="hidden" name="ticket" th:value="${ticket}" />
+        <input type="hidden" name="precio" th:value="${precio}" />
+        <input type="hidden" name="nombreComercio" th:value="${nombreComercio}" />
+        <input type="hidden" name="fecha" th:value="${fecha}" />
+        <input type="hidden" name="hora" th:value="${hora}" />
+
         <button type="submit">Finalizar compra</button>
     </form>
 </div>
