@@ -15,6 +15,8 @@
     <p><strong>Ticket del Pedido:</strong> <span th:text="${ticket}">TICKET-666</span></p>
     <p><strong>Precio Total a Pagar:</strong> $<span th:text="${precio}">666.666</span></p>
     <input type="hidden" name="nombreComercio" th:value="${nombreComercio}">
+    <input type="hidden" name="fecha" th:value="${fecha}">
+    <input type="hidden" name="hora" th:value="${hora}">
 </div>
 <div>
     <form th:action="@{/tienda/pagoFormProxy}" method="get">

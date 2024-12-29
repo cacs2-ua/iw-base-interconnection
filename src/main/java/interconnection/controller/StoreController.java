@@ -44,10 +44,14 @@ public class StoreController {
         String ticket = "TICKET-666";
         double precio = 666.666;
         String nombreComercio = "Tienda Online";
+        String fecha = "08/10/2024";
+        String hora = "12:45";
 
         model.addAttribute("ticket", ticket);
         model.addAttribute("precio", precio);
         model.addAttribute("nombreComercio", nombreComercio);
+        model.addAttribute("fecha", fecha);
+        model.addAttribute("hora", hora);
         return "checkout";
     }
 
