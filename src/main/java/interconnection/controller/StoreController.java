@@ -1,6 +1,6 @@
 package interconnection.controller;
 
-import interconnection.dto.PagoData;
+import interconnection.dto.PagoCompletoForm;
 import interconnection.service.ParametroComercioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -8,12 +8,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import interconnection.dto.PagoCompletoRequest;
+import interconnection.dto.PagoData;
+import interconnection.dto.TarjetaPagoData;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 
-/**
- * Controlador de la Tienda que actúa como 'Cliente' ante el TPVV.
- */
 @Controller
 @RequestMapping("/tienda")
 public class StoreController {
@@ -24,15 +27,9 @@ public class StoreController {
     @Autowired
     private RestTemplate restTemplate;
 
-    /**
-     * Muestra la página de checkout con el ticket y el precio (datos "hardcodeados" de ejemplo).
-     *
-     * @param model El modelo para la vista.
-     * @return checkout.html
-     */
     @GetMapping("/checkout")
     public String mostrarCheckout(Model model) {
-        // Datos hardcodeados para el ejemplo
+        // Ejemplo con datos "hardcodeados"
         String ticket = "TICKET-777";
         double precio = 777.777;
         String nombreComercio = "Tienda Online v2";
@@ -49,8 +46,8 @@ public class StoreController {
     }
 
     /**
-     * Maneja la acción de finalizar compra (GET) y obtiene via proxy
-     * el formulario de pago desde la app TPVV (puerto 8123).
+     * Descarga el fragmento HTML del formulario de pago desde el TPVV y lo inyecta
+     * con los datos reales (ticket, importe, etc.).
      */
     @GetMapping("/pagoFormProxy")
     public String pagoFormProxy(@RequestParam("ticket") String ticket,
@@ -60,52 +57,69 @@ public class StoreController {
                                 @RequestParam("hora") String hora,
                                 Model model) {
 
-        // 1) Recuperar la API Key desde la base de datos
         Optional<String> apiKeyOpt = parametroComercioService.getValorParametro("apiKey");
         if (apiKeyOpt.isEmpty()) {
-            model.addAttribute("error", "Error: API Key no encontrada en los parámetros.");
+            model.addAttribute("error", "Error: API Key no encontrada.");
             return "error/404";
         }
         String apiKey = apiKeyOpt.get();
 
-        // 2) Configurar la cabecera "Authorization" con la apiKey
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", apiKey);
 
-        // 3) Construir la URL al TPVV
-        //    Observa que enviamos importe y idTicket para que el TPVV forme "pagoData"
+        // Llamada GET al TPVV
         String url = "http://localhost:8123/tpvv/boardalo/pago/form?importe=" + precio
                 + "&idTicket=" + ticket;
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
-            // 4) Realizar la llamada GET con RestTemplate (proxy) para obtener el HTML del form
-            ResponseEntity<String> response =
-                    restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                // *** HTML original que viene del TPVV ***
                 String originalHtml = response.getBody();
 
-                // 5) Reemplazar la acción del formulario para el POST
-                //    (de /tpvv/boardalo/pago/realizar a /tienda/realizarPagoProxy)
+                // Modificamos el <form> para que apunte a nuestro Proxy
                 String modificadoHtml = originalHtml.replace(
-                        "/tpvv/boardalo/pago/realizar",
-                        "/tienda/realizarPagoProxy"
+                        "<form class=\"card-form\">",
+                        "<form class=\"card-form\" method=\"post\" action=\"/tienda/realizarPagoProxy\">"
                 );
 
-                // 6) Reemplazar los valores de ejemplo por los reales recibidos del checkout
-                //    Ojo: Asegúrate de que coincidan EXACTAMENTE con lo que aparece en paymentForm.html
-                //    - 218,42 €
-                //    - Paquetería
-                //    - 000000001
-                //    - 09/12/2024
-                //    - 10:46
+                // Añadir name="..." en los inputs
+                // 1) Nombre
+                modificadoHtml = modificadoHtml.replace(
+                        "<input type=\"text\" class=\"card-input\" placeholder=\"Nombre Completo\">",
+                        "<input type=\"text\" class=\"card-input\" name=\"nombre\" placeholder=\"Nombre Completo\">"
+                );
 
-                // Si quieres formatear "precio" a 2 decimales:
+                // 2) Nº Tarjeta
+                modificadoHtml = modificadoHtml.replace(
+                        "<input type=\"text\" class=\"card-input\" placeholder=\"0000 0000 0000 0000\">",
+                        "<input type=\"text\" class=\"card-input\" name=\"numeroTarjeta\" placeholder=\"0000 0000 0000 0000\">"
+                );
+
+                // 3) Caducidad
+                modificadoHtml = modificadoHtml.replace(
+                        "<input type=\"text\" class=\"card-input expiry-date\" placeholder=\"mm/aa\">",
+                        "<input type=\"text\" class=\"card-input expiry-date\" name=\"caducidad\" placeholder=\"mm/aa\">"
+                );
+
+                // 4) CVC
+                modificadoHtml = modificadoHtml.replace(
+                        "<input type=\"text\" class=\"card-input security-code\" placeholder=\"***\">",
+                        "<input type=\"text\" class=\"card-input security-code\" name=\"cvc\" placeholder=\"***\">"
+                );
+
+                // Añadir campos ocultos para Importe, Ticket, Fecha (unida a hora), etc.
+                String hiddenFields = ""
+                        + "<input type=\"hidden\" name=\"importe\" value=\"" + precio + "\"/>"
+                        + "<input type=\"hidden\" name=\"ticketExt\" value=\"" + ticket + "\"/>"
+                        + "<input type=\"hidden\" name=\"fecha\" value=\"" + fecha + " " + hora + "\"/>";
+
+                modificadoHtml = modificadoHtml.replace("</form>", hiddenFields + "</form>");
+
+                // Reemplazar textos fijos en el HTML
                 String precioFormateado = String.format("%.2f", precio);
-
                 modificadoHtml = modificadoHtml
                         .replace("218,42 €", precioFormateado + " €")
                         .replace("Paquetería", nombreComercio)
@@ -113,63 +127,88 @@ public class StoreController {
                         .replace("09/12/2024", fecha)
                         .replace("10:46", hora);
 
-                // 7) Insertar el HTML resultante en el modelo
                 model.addAttribute("paymentFormContent", modificadoHtml);
                 model.addAttribute("fullPage", false);
-
-                return "paymentFormProxy"; // Plantilla que muestra el HTML inyectado
+                return "paymentFormProxy";
             } else {
-                model.addAttribute("error", "Error al acceder al formulario de pago en TPVV.");
+                model.addAttribute("error", "Error al obtener el formulario de pago del TPVV.");
                 return "error/404";
             }
         } catch (Exception e) {
-            model.addAttribute("error",
-                    "Error al procesar la solicitud contra TPVV: " + e.getMessage());
+            model.addAttribute("error", "Excepción al llamar al TPVV: " + e.getMessage());
             return "error/404";
         }
     }
 
     /**
-     * Reverse Proxy para manejar el POST de realizar pago.
-     * Redirige la petición final al TPVV incluyendo la cabecera Authorization.
+     * Maneja el POST del formulario, construye el JSON (PagoCompletoRequest)
+     * y lo envía al mismo endpoint /pago/realizar del TPVV (sin crear uno nuevo).
      */
     @PostMapping("/realizarPagoProxy")
-    public String realizarPagoProxy(@ModelAttribute("pagoData") PagoData pagoData,
+    public String realizarPagoProxy(@ModelAttribute PagoCompletoForm form,
                                     Model model) {
-        // 1) Recuperar la API Key
+
         Optional<String> apiKeyOpt = parametroComercioService.getValorParametro("apiKey");
         if (apiKeyOpt.isEmpty()) {
-            model.addAttribute("error", "API Key no encontrada en los parámetros.");
+            model.addAttribute("error", "API Key no encontrada.");
             return "error/404";
         }
         String apiKey = apiKeyOpt.get();
 
-        // 2) Creamos la cabecera con Authorization
+        // Creamos TarjetaPagoData
+        TarjetaPagoData tarjetaData = new TarjetaPagoData();
+        tarjetaData.setNombre(form.getNombre());
+        tarjetaData.setNumeroTarjeta(form.getNumeroTarjeta());
+        tarjetaData.setCvc(Integer.parseInt(form.getCvc()));
+
+        // Parse de caducidad "mm/aa" a Date
+        Date fechaCaducidad = new Date();
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/yy");
+            fechaCaducidad = sdf.parse(form.getCaducidad());
+        } catch (ParseException e) {
+            // Si falla el parseo, dejamos fechaCaducidad como 'new Date()' (ejemplo)
+        }
+        tarjetaData.setFechaCaducidad(fechaCaducidad);
+
+        // Creamos PagoData
+        PagoData pagoData = new PagoData();
+        pagoData.setImporte(form.getImporte() != null ? form.getImporte() : 0.0);
+        pagoData.setTicketExt(form.getTicketExt());
+
+        // Si form.getFecha() es null, establecemos 'new Date()' como fallback
+        if (form.getFecha() == null) {
+            pagoData.setFecha(new Date());
+        } else {
+            pagoData.setFecha(form.getFecha());
+        }
+
+        // Armamos la request
+        PagoCompletoRequest requestBody = new PagoCompletoRequest(pagoData, tarjetaData);
+
+        // Cabecera con la API Key
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", apiKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // 3) Enviamos en el body un JSON con los datos de pago
-        HttpEntity<PagoData> requestEntity = new HttpEntity<>(pagoData, headers);
+        HttpEntity<PagoCompletoRequest> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        // 4) Llamamos al /pago/realizar de TPVV
+        // Llamada al MISMO endpoint de TPVV: /pago/realizar
         String urlTPVV = "http://localhost:8123/tpvv/boardalo/pago/realizar";
+
         try {
-            ResponseEntity<String> response =
-                    restTemplate.postForEntity(urlTPVV, requestEntity, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(urlTPVV, requestEntity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                // Ej. "Pago procesado correctamente."
-                String mensajeTPVV = response.getBody();
-                model.addAttribute("msgOk", mensajeTPVV);
-                return "pagoOk";  // Muestra una vista de éxito con "msgOk"
+                String msg = response.getBody();
+                model.addAttribute("msgOk", msg);
+                return "pagoOk";
             } else {
-                model.addAttribute("error", "Error en la respuesta del TPVV: "
-                        + response.getStatusCode());
+                model.addAttribute("error", "Error en respuesta TPVV: " + response.getStatusCode());
                 return "error/404";
             }
         } catch (Exception e) {
-            model.addAttribute("error", "Excepción en la llamada POST al TPVV: " + e.getMessage());
+            model.addAttribute("error", "Excepción POST a TPVV: " + e.getMessage());
             return "error/404";
         }
     }
