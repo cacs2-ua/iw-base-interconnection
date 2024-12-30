@@ -30,8 +30,8 @@ public class StoreController {
     @GetMapping("/checkout")
     public String mostrarCheckout(Model model) {
         // Ejemplo con datos "hardcodeados"
-        String ticket = "TICKET-777";
-        double precio = 777.777;
+        String ticket = "TICKET-888";
+        double precio = 888.888;
         String nombreComercio = "Tienda Online v2";
         String fecha = "09/09/2029";
         String hora = "13:45";
