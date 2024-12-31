@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import interconnection.dto.PagoCompletoRequest;
+import interconnection.dto.PedidoCompletoRequest;
 import interconnection.dto.PagoData;
 import interconnection.dto.TarjetaPagoData;
 
@@ -17,9 +18,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 @RequestMapping("/tienda")
 public class StoreController {
+
+    private static final Logger log = LoggerFactory.getLogger(StoreController.class);
+
 
     @Autowired
     private ParametroComercioService parametroComercioService;
@@ -211,5 +218,11 @@ public class StoreController {
             model.addAttribute("error", "Excepción POST a TPVV: " + e.getMessage());
             return "error/404";
         }
+    }
+
+    @PostMapping("/receivePedido")
+    public ResponseEntity<String> receivePedido(@RequestBody PedidoCompletoRequest request) {
+        log.debug("Recibido en la tienda un PedidoCompletoRequest: {}", request);
+        return ResponseEntity.ok("Pedido recibido en la tienda con exito!");
     }
 }

@@ -3,7 +3,7 @@ package interconnection.dto;
 import java.util.Date;
 import java.util.Objects;
 
-public class PedidoCompletadoRequest {
+public class PedidoCompletoRequest {
 
 
     private Long id;
@@ -12,13 +12,12 @@ public class PedidoCompletadoRequest {
     private String ticketExt;
     private Date fecha;
     private double importe;
-    private String tarjeta;
     private String estadoPago;
     private String comercioNombre;
-    private String tarjetaPagoNumero;
+    private String numeroTarjeta;
 
     // Constructor vacío
-    public PedidoCompletadoRequest() {}
+    public PedidoCompletoRequest() {}
 
     // Getters y Setters
     public Long getId() {
@@ -41,6 +40,23 @@ public class PedidoCompletadoRequest {
         return fecha;
     }
 
+    public Long getPagoId() {
+        return pagoId;
+    }
+
+    public void setPagoId(Long pagoId) {
+        this.pagoId = pagoId;
+    }
+
+    public Long getPedidoId() {
+        return pedidoId;
+    }
+
+    public void setPedidoId(Long pedidoId) {
+        this.pedidoId = pedidoId;
+    }
+
+
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
@@ -51,14 +67,6 @@ public class PedidoCompletadoRequest {
 
     public void setImporte(double importe) {
         this.importe = importe;
-    }
-
-    public String getTarjeta() {
-        return tarjeta;
-    }
-
-    public void setTarjeta(String tarjeta) {
-        this.tarjeta = tarjeta;
     }
 
     public String getEstadoPago() {
@@ -77,18 +85,18 @@ public class PedidoCompletadoRequest {
         this.comercioNombre = comercioNombre;
     }
 
-    public String getTarjetaPagoNumero() {
-        return tarjetaPagoNumero;
+    public String getNumeroTarjeta() {
+        return numeroTarjeta;
     }
 
-    public void setTarjetaPagoNumero(String tarjetaPagoNumero) {
-        this.tarjetaPagoNumero = tarjetaPagoNumero;
+    public void setNumeroTarjeta(String numeroTarjeta) {
+        this.numeroTarjeta = numeroTarjeta;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PedidoCompletadoRequest that)) return false;
+        if (!(o instanceof PedidoCompletoRequest that)) return false;
         return Objects.equals(getId(), that.getId());
     }
 
@@ -99,10 +107,9 @@ public class PedidoCompletadoRequest {
                 ", ticketExt='" + ticketExt + '\'' +
                 ", fecha=" + fecha +
                 ", importe=" + importe +
-                ", tarjeta='" + tarjeta + '\'' +
                 ", estadoPago='" + estadoPago + '\'' +
                 ", comercioNombre='" + comercioNombre + '\'' +
-                ", tarjetaPagoNumero='" + tarjetaPagoNumero + '\'' +
+                ", numeroTarjeta='" + numeroTarjeta + '\'' +
                 '}';
     }
 
