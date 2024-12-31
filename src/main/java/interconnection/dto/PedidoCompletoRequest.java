@@ -19,6 +19,20 @@ public class PedidoCompletoRequest {
     // Constructor vacío
     public PedidoCompletoRequest() {}
 
+
+    public PedidoCompletoRequest(Long id, Long pagoId, Long pedidoId, String ticketExt, Date fecha, double importe, String estadoPago, String comercioNombre, String numeroTarjeta) {
+        this.id = id;
+        this.pagoId = pagoId;
+        this.pedidoId = pedidoId;
+        this.ticketExt = ticketExt;
+        this.fecha = fecha;
+        this.importe = importe;
+        this.estadoPago = estadoPago;
+        this.comercioNombre = comercioNombre;
+        this.numeroTarjeta = numeroTarjeta;
+    }
+
+
     // Getters y Setters
     public Long getId() {
         return id;

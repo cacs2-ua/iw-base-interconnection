@@ -46,10 +46,17 @@ public class PedidoCompletado implements Serializable {
         this.importe = 0.0;
     }
 
-    public PedidoCompletado(String ticketExt, Date fecha, double importe, Comercio comercio, TarjetaPago tarjetaPago) {
+
+    public PedidoCompletado(String ticketExt, Date fecha, double importe, Long pagoId, Long pedidoId, String tarjeta, String estadoPago, String comercioNombre, String tarjetaPagoNumero) {
         this.ticketExt = ticketExt;
         this.fecha = fecha;
         this.importe = importe;
+        this.pagoId = pagoId;
+        this.pedidoId = pedidoId;
+        this.tarjeta = tarjeta;
+        this.estadoPago = estadoPago;
+        this.comercioNombre = comercioNombre;
+        this.tarjetaPagoNumero = tarjetaPagoNumero;
     }
 
     public Long getId() {

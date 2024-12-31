@@ -1,7 +1,9 @@
 package interconnection.controller;
 
 import interconnection.dto.PagoCompletoForm;
+import interconnection.service.PagoService;
 import interconnection.service.ParametroComercioService;
+import interconnection.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -33,6 +35,11 @@ public class StoreController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private PedidoService pedidoService;
+    @Autowired
+    private PagoService pagoService;
 
     @GetMapping("/checkout")
     public String mostrarCheckout(Model model) {
@@ -223,6 +230,14 @@ public class StoreController {
     @PostMapping("/receivePedido")
     public ResponseEntity<String> receivePedido(@RequestBody PedidoCompletoRequest request) {
         log.debug("Recibido en la tienda un PedidoCompletoRequest: {}", request);
-        return ResponseEntity.ok("Pedido recibido en la tienda con exito!");
+
+        try {
+            pagoService.procesarPedido(request);
+            return ResponseEntity.ok("Pedido recibido y guardado con éxito.");
+        }
+        catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body("Error 404");
+        }
+
     }
 }
