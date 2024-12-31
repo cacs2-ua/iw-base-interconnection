@@ -1,12 +1,13 @@
 package interconnection.dto;
 
-import java.util.Date;
 import java.util.Objects;
 
 public class PagoData {
     private Long id;
     private String ticketExt;
-    private Date fecha;
+
+    // MODIFICADO: Antes era Date, ahora String
+    private String fecha;
 
     // MODIFICADO: Antes era double, ahora String
     private String importe;
@@ -34,14 +35,15 @@ public class PagoData {
         this.ticketExt = ticketExt;
     }
 
-    public Date getFecha() {
+    // MODIFICADO: Getter/Setter fecha como String
+    public String getFecha() {
         return fecha;
     }
-    public void setFecha(Date fecha) {
+    public void setFecha(String fecha) {
         this.fecha = fecha;
     }
 
-    // MODIFICADO: Getter/Setter de importe como String
+    // MODIFICADO: Getter/Setter importe como String
     public String getImporte() {
         return importe;
     }
@@ -85,21 +87,21 @@ public class PagoData {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
     public String toString() {
         return "PagoData{" +
                 "id=" + id +
                 ", ticketExt='" + ticketExt + '\'' +
-                ", fecha=" + fecha +
+                ", fecha='" + fecha + '\'' +
                 ", importe='" + importe + '\'' +
                 ", tarjeta='" + tarjeta + '\'' +
                 ", estadoPago='" + estadoPago + '\'' +
                 ", comercioNombre='" + comercioNombre + '\'' +
                 ", tarjetaPagoNumero='" + tarjetaPagoNumero + '\'' +
                 '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
     }
 }

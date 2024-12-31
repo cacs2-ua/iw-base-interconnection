@@ -171,21 +171,8 @@ public class StoreController {
         pagoData.setImporte(form.getImporte());                  // importe como String
         pagoData.setTicketExt(form.getTicketExt());
 
-        // Parseamos la fecha (string -> Date) aquí o enviamos string?
-        // En el enunciado, no se requiere que PagoData.fecha sea String, se mantiene Date en el DTO.
-        // Para no romper, parseamos:
-        if (form.getFecha() == null) {
-            pagoData.setFecha(new Date());
-        } else {
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                Date parsedDate = sdf.parse(form.getFecha());
-                pagoData.setFecha(parsedDate);
-            } catch (ParseException e) {
-                // Fallback
-                pagoData.setFecha(new Date());
-            }
-        }
+        // MODIFICADO: Ahora, la fecha en PagoData es String
+        pagoData.setFecha(form.getFecha());                      // fecha como String
 
         // Construimos la request
         PagoCompletoRequest requestBody = new PagoCompletoRequest(pagoData, tarjetaData);
