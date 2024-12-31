@@ -1,16 +1,14 @@
 package interconnection.dto;
 
-import java.util.Date;
-
 /**
  * Form que agrupa los campos del pago + los campos de la tarjeta.
  */
 public class PagoCompletoForm {
 
-    // PagoData
-    private Double importe;
+    // MODIFICADO: ahora son String en lugar de Double / Date
+    private String importe;   // era Double
     private String ticketExt;
-    private Date fecha; // en este ejemplo se supone que ya lo guardamos como Date
+    private String fecha;     // era Date
 
     // TarjetaPagoData
     private String nombre;
@@ -21,27 +19,22 @@ public class PagoCompletoForm {
     public PagoCompletoForm() {}
 
     // Getters & Setters
-    public Double getImporte() {
+
+    // MODIFICADO: Getter/Setter de importe como String
+    public String getImporte() {
         return importe;
     }
 
-    public void setImporte(Double importe) {
+    public void setImporte(String importe) {
         this.importe = importe;
     }
 
-    public String getTicketExt() {
-        return ticketExt;
-    }
-
-    public void setTicketExt(String ticketExt) {
-        this.ticketExt = ticketExt;
-    }
-
-    public Date getFecha() {
+    // MODIFICADO: Getter/Setter de fecha como String
+    public String getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(String fecha) {
         this.fecha = fecha;
     }
 
@@ -75,5 +68,13 @@ public class PagoCompletoForm {
 
     public void setCvc(String cvc) {
         this.cvc = cvc;
+    }
+
+    public String getTicketExt() {
+        return ticketExt;
+    }
+
+    public void setTicketExt(String ticketExt) {
+        this.ticketExt = ticketExt;
     }
 }

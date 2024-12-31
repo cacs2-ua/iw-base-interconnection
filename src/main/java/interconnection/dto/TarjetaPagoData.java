@@ -1,14 +1,18 @@
 package interconnection.dto;
 
-import java.util.Date;
 import java.util.Objects;
 
 public class TarjetaPagoData {
 
     private Long id;
     private String numeroTarjeta;
-    private int cvc;
-    private Date fechaCaducidad;
+
+    // MODIFICADO: Antes era int
+    private String cvc;
+
+    // MODIFICADO: Antes era Date
+    private String fechaCaducidad;
+
     private String nombre;
 
     public Long getId() {
@@ -27,19 +31,21 @@ public class TarjetaPagoData {
         this.numeroTarjeta = numeroTarjeta;
     }
 
-    public int getCvc() {
+    // MODIFICADO: cvc como String
+    public String getCvc() {
         return cvc;
     }
 
-    public void setCvc(int cvc) {
+    public void setCvc(String cvc) {
         this.cvc = cvc;
     }
 
-    public Date getFechaCaducidad() {
+    // MODIFICADO: fechaCaducidad como String
+    public String getFechaCaducidad() {
         return fechaCaducidad;
     }
 
-    public void setFechaCaducidad(Date fechaCaducidad) {
+    public void setFechaCaducidad(String fechaCaducidad) {
         this.fechaCaducidad = fechaCaducidad;
     }
 
@@ -52,7 +58,6 @@ public class TarjetaPagoData {
     }
 
     // equals, hashCode
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

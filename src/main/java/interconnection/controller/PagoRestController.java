@@ -28,8 +28,20 @@ public class PagoRestController {
     public ResponseEntity<String> realizarPago(@Valid @RequestBody PagoData pagoData) {
 
         // Validación simple: verificar si los campos necesarios están presentes
-        if (pagoData.getImporte() <= 0 || pagoData.getTicketExt() == null || pagoData.getTarjeta() == null) {
+        if (pagoData.getImporte() == null || pagoData.getTicketExt() == null || pagoData.getTarjeta() == null) {
             return ResponseEntity.badRequest().body("Error: Faltan datos requeridos (importe, ticketExt, tarjeta).");
+        }
+
+        // Intentar convertir el importe de String a double
+        double importe;
+        try {
+            importe = Double.parseDouble(pagoData.getImporte());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("Error: Importe no válido.");
+        }
+
+        if (importe <= 0) {
+            return ResponseEntity.badRequest().body("Error: El importe debe ser mayor que cero.");
         }
 
         // Si todo está bien, responder con un "ok" en JSON

@@ -29,7 +29,6 @@ public class StoreController {
 
     private static final Logger log = LoggerFactory.getLogger(StoreController.class);
 
-
     @Autowired
     private ParametroComercioService parametroComercioService;
 
@@ -38,6 +37,7 @@ public class StoreController {
 
     @Autowired
     private PedidoService pedidoService;
+
     @Autowired
     private PagoService pagoService;
 
@@ -59,10 +59,6 @@ public class StoreController {
         return "checkout";
     }
 
-    /**
-     * Descarga el fragmento HTML del formulario de pago desde el TPVV y lo inyecta
-     * con los datos reales (ticket, importe, etc.).
-     */
     @GetMapping("/pagoFormProxy")
     public String pagoFormProxy(@RequestParam("ticket") String ticket,
                                 @RequestParam("precio") double precio,
@@ -81,7 +77,6 @@ public class StoreController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", apiKey);
 
-        // Llamada GET al TPVV
         String url = "http://localhost:8123/tpvv/boardalo/pago/form?importe=" + precio
                 + "&idTicket=" + ticket;
 
@@ -100,25 +95,18 @@ public class StoreController {
                 );
 
                 // Añadir name="..." en los inputs
-                // 1) Nombre
                 modificadoHtml = modificadoHtml.replace(
                         "<input type=\"text\" class=\"card-input\" placeholder=\"Nombre Completo\">",
                         "<input type=\"text\" class=\"card-input\" name=\"nombre\" placeholder=\"Nombre Completo\">"
                 );
-
-                // 2) Nº Tarjeta
                 modificadoHtml = modificadoHtml.replace(
                         "<input type=\"text\" class=\"card-input\" placeholder=\"0000 0000 0000 0000\">",
                         "<input type=\"text\" class=\"card-input\" name=\"numeroTarjeta\" placeholder=\"0000 0000 0000 0000\">"
                 );
-
-                // 3) Caducidad
                 modificadoHtml = modificadoHtml.replace(
                         "<input type=\"text\" class=\"card-input expiry-date\" placeholder=\"mm/aa\">",
                         "<input type=\"text\" class=\"card-input expiry-date\" name=\"caducidad\" placeholder=\"mm/aa\">"
                 );
-
-                // 4) CVC
                 modificadoHtml = modificadoHtml.replace(
                         "<input type=\"text\" class=\"card-input security-code\" placeholder=\"***\">",
                         "<input type=\"text\" class=\"card-input security-code\" name=\"cvc\" placeholder=\"***\">"
@@ -156,7 +144,7 @@ public class StoreController {
 
     /**
      * Maneja el POST del formulario, construye el JSON (PagoCompletoRequest)
-     * y lo envía al mismo endpoint /pago/realizar del TPVV (sin crear uno nuevo).
+     * y lo envía al mismo endpoint /pago/realizar del TPVV.
      */
     @PostMapping("/realizarPagoProxy")
     public String realizarPagoProxy(@ModelAttribute PagoCompletoForm form,
@@ -169,35 +157,37 @@ public class StoreController {
         }
         String apiKey = apiKeyOpt.get();
 
-        // Creamos TarjetaPagoData
+        // MODIFICADO: Ahora NO parseamos a double/int/Date en el cliente. Solo asignamos strings.
+
+        // TarjetaPagoData
         TarjetaPagoData tarjetaData = new TarjetaPagoData();
         tarjetaData.setNombre(form.getNombre());
         tarjetaData.setNumeroTarjeta(form.getNumeroTarjeta());
-        tarjetaData.setCvc(Integer.parseInt(form.getCvc()));
+        tarjetaData.setCvc(form.getCvc());                       // cvc como String
+        tarjetaData.setFechaCaducidad(form.getCaducidad());      // fechaCaducidad como String
 
-        // Parse de caducidad "mm/aa" a Date
-        Date fechaCaducidad = new Date();
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/yy");
-            fechaCaducidad = sdf.parse(form.getCaducidad());
-        } catch (ParseException e) {
-            // Si falla el parseo, dejamos fechaCaducidad como 'new Date()' (ejemplo)
-        }
-        tarjetaData.setFechaCaducidad(fechaCaducidad);
-
-        // Creamos PagoData
+        // PagoData
         PagoData pagoData = new PagoData();
-        pagoData.setImporte(form.getImporte() != null ? form.getImporte() : 0.0);
+        pagoData.setImporte(form.getImporte());                  // importe como String
         pagoData.setTicketExt(form.getTicketExt());
 
-        // Si form.getFecha() es null, establecemos 'new Date()' como fallback
+        // Parseamos la fecha (string -> Date) aquí o enviamos string?
+        // En el enunciado, no se requiere que PagoData.fecha sea String, se mantiene Date en el DTO.
+        // Para no romper, parseamos:
         if (form.getFecha() == null) {
             pagoData.setFecha(new Date());
         } else {
-            pagoData.setFecha(form.getFecha());
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                Date parsedDate = sdf.parse(form.getFecha());
+                pagoData.setFecha(parsedDate);
+            } catch (ParseException e) {
+                // Fallback
+                pagoData.setFecha(new Date());
+            }
         }
 
-        // Armamos la request
+        // Construimos la request
         PagoCompletoRequest requestBody = new PagoCompletoRequest(pagoData, tarjetaData);
 
         // Cabecera con la API Key
@@ -207,7 +197,7 @@ public class StoreController {
 
         HttpEntity<PagoCompletoRequest> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        // Llamada al MISMO endpoint de TPVV: /pago/realizar
+        // Llamada al endpoint del TPVV
         String urlTPVV = "http://localhost:8123/tpvv/boardalo/pago/realizar";
 
         try {
@@ -234,10 +224,8 @@ public class StoreController {
         try {
             pagoService.procesarPedido(request);
             return ResponseEntity.ok("Pedido recibido y guardado con éxito.");
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body("Error 404");
         }
-
     }
 }
