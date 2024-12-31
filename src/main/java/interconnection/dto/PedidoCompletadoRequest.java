@@ -3,7 +3,7 @@ package interconnection.dto;
 import java.util.Date;
 import java.util.Objects;
 
-public class PedidoCompletadoData {
+public class PedidoCompletadoRequest {
 
 
     private Long id;
@@ -18,7 +18,7 @@ public class PedidoCompletadoData {
     private String tarjetaPagoNumero;
 
     // Constructor vacío
-    public PedidoCompletadoData() {}
+    public PedidoCompletadoRequest() {}
 
     // Getters y Setters
     public Long getId() {
@@ -88,7 +88,7 @@ public class PedidoCompletadoData {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PedidoCompletadoData that)) return false;
+        if (!(o instanceof PedidoCompletadoRequest that)) return false;
         return Objects.equals(getId(), that.getId());
     }
 
