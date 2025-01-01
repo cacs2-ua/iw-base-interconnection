@@ -235,7 +235,6 @@ public class StoreController {
             pagoService.procesarPedido(request);
             return ResponseEntity.ok("Pedido recibido y guardado con éxito.");
 
-
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body("Error 404");
         }
