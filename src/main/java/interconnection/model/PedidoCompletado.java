@@ -21,7 +21,7 @@ public class PedidoCompletado implements Serializable {
 
     private  String ticketExt;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;
 
     private double importe;
