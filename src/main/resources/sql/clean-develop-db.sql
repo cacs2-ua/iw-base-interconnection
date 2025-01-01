@@ -1,3 +1,5 @@
+DELETE FROM parametros_comercio;
+DELETE FROM pedido_completados;
 DELETE FROM parametros;
 DELETE FROM mensajes;
 DELETE FROM valoraciones_tecnico;
