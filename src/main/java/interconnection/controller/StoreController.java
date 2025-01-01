@@ -233,10 +233,6 @@ public class StoreController {
 
         try {
             pagoService.procesarPedido(request);
-            Optional<PedidoCompletado> optionalPedidoCompletado = pedidoCompletadoRepository.findById(27L);
-            log.debug("Recibido en la tienda un PedidoCompletoRequest: {}", request);
-            log.debug("Recibido en la tienda un PedidoCompletoRequest: {}", request);
-            log.debug("Recibido en la tienda un PedidoCompletoRequest: {}", request);
             return ResponseEntity.ok("Pedido recibido y guardado con éxito.");
 
 
