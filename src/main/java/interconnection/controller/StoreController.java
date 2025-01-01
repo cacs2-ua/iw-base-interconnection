@@ -1,6 +1,10 @@
 package interconnection.controller;
 
 import interconnection.dto.PagoCompletoForm;
+import interconnection.model.Pago;
+import interconnection.model.PedidoCompletado;
+import interconnection.repository.PagoRepository;
+import interconnection.repository.PedidoCompletadoRepository;
 import interconnection.service.PagoService;
 import interconnection.service.ParametroComercioService;
 import interconnection.service.PedidoService;
@@ -39,6 +43,10 @@ public class StoreController {
 
     @Autowired
     private PagoService pagoService;
+    @Autowired
+    private PagoRepository pagoRepository;
+    @Autowired
+    private PedidoCompletadoRepository pedidoCompletadoRepository;
 
     @GetMapping("/checkout")
     public String mostrarCheckout(Model model) {
@@ -225,7 +233,13 @@ public class StoreController {
 
         try {
             pagoService.procesarPedido(request);
+            Optional<PedidoCompletado> optionalPedidoCompletado = pedidoCompletadoRepository.findById(27L);
+            log.debug("Recibido en la tienda un PedidoCompletoRequest: {}", request);
+            log.debug("Recibido en la tienda un PedidoCompletoRequest: {}", request);
+            log.debug("Recibido en la tienda un PedidoCompletoRequest: {}", request);
             return ResponseEntity.ok("Pedido recibido y guardado con éxito.");
+
+
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body("Error 404");
         }

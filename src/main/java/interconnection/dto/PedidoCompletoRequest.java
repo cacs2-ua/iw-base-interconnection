@@ -1,36 +1,44 @@
 package interconnection.dto;
 
-import java.util.Date;
 import java.util.Objects;
 
+/**
+ * Ahora 'fecha' y 'importe' serán String para
+ * mantener consistencia con el refactor del servidor.
+ */
 public class PedidoCompletoRequest {
-
 
     private Long id;
     private Long pagoId;
     private Long pedidoId;
     private String ticketExt;
-    private Date fecha;
-    private double importe;
+
+    // MODIFICADO: antes era Date fecha
+    private String fecha;
+
+    // MODIFICADO: antes era double importe
+    private String importe;
+
     private String estadoPago;
     private String comercioNombre;
     private String numeroTarjeta;
 
-    public PedidoCompletoRequest() {}
+    public PedidoCompletoRequest() {
+    }
 
-
-    public PedidoCompletoRequest(Long id, Long pagoId, Long pedidoId, String ticketExt, Date fecha, double importe, String estadoPago, String comercioNombre, String numeroTarjeta) {
+    public PedidoCompletoRequest(Long id, Long pagoId, Long pedidoId, String ticketExt,
+                                 String fecha, String importe,
+                                 String estadoPago, String comercioNombre, String numeroTarjeta) {
         this.id = id;
         this.pagoId = pagoId;
         this.pedidoId = pedidoId;
         this.ticketExt = ticketExt;
-        this.fecha = fecha;
-        this.importe = importe;
+        this.fecha = fecha;            // MODIFICADO
+        this.importe = importe;        // MODIFICADO
         this.estadoPago = estadoPago;
         this.comercioNombre = comercioNombre;
         this.numeroTarjeta = numeroTarjeta;
     }
-
 
     // Getters y Setters
     public Long getId() {
@@ -39,18 +47,6 @@ public class PedidoCompletoRequest {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getTicketExt() {
-        return ticketExt;
-    }
-
-    public void setTicketExt(String ticketExt) {
-        this.ticketExt = ticketExt;
-    }
-
-    public Date getFecha() {
-        return fecha;
     }
 
     public Long getPagoId() {
@@ -69,16 +65,31 @@ public class PedidoCompletoRequest {
         this.pedidoId = pedidoId;
     }
 
+    public String getTicketExt() {
+        return ticketExt;
+    }
 
-    public void setFecha(Date fecha) {
+    public void setTicketExt(String ticketExt) {
+        this.ticketExt = ticketExt;
+    }
+
+    // MODIFICADO: getFecha() ahora retorna String
+    public String getFecha() {
+        return fecha;
+    }
+
+    // MODIFICADO: setFecha() ahora recibe String
+    public void setFecha(String fecha) {
         this.fecha = fecha;
     }
 
-    public double getImporte() {
+    // MODIFICADO: getImporte() ahora retorna String
+    public String getImporte() {
         return importe;
     }
 
-    public void setImporte(double importe) {
+    // MODIFICADO: setImporte() ahora recibe String
+    public void setImporte(String importe) {
         this.importe = importe;
     }
 
@@ -117,9 +128,11 @@ public class PedidoCompletoRequest {
     public String toString() {
         return "PedidoCompletoRequest{" +
                 "id=" + id +
+                ", pagoId=" + pagoId +
+                ", pedidoId=" + pedidoId +
                 ", ticketExt='" + ticketExt + '\'' +
-                ", fecha=" + fecha +
-                ", importe=" + importe +
+                ", fecha='" + fecha + '\'' +           // MODIFICADO
+                ", importe='" + importe + '\'' +       // MODIFICADO
                 ", estadoPago='" + estadoPago + '\'' +
                 ", comercioNombre='" + comercioNombre + '\'' +
                 ", numeroTarjeta='" + numeroTarjeta + '\'' +
@@ -130,5 +143,4 @@ public class PedidoCompletoRequest {
     public int hashCode() {
         return Objects.hash(getId());
     }
-
 }
