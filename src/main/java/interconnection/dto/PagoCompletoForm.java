@@ -5,12 +5,10 @@ package interconnection.dto;
  */
 public class PagoCompletoForm {
 
-    // MODIFICADO: ahora son String en lugar de Double / Date
     private String importe;   // era Double
     private String ticketExt;
     private String fecha;     // era Date
 
-    // TarjetaPagoData
     private String nombre;
     private String numeroTarjeta;
     private String caducidad; // "mm/aa"
@@ -18,9 +16,6 @@ public class PagoCompletoForm {
 
     public PagoCompletoForm() {}
 
-    // Getters & Setters
-
-    // MODIFICADO: Getter/Setter de importe como String
     public String getImporte() {
         return importe;
     }
@@ -29,7 +24,6 @@ public class PagoCompletoForm {
         this.importe = importe;
     }
 
-    // MODIFICADO: Getter/Setter de fecha como String
     public String getFecha() {
         return fecha;
     }

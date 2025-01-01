@@ -16,7 +16,6 @@ public class PedidoCompletoRequest {
     private String comercioNombre;
     private String numeroTarjeta;
 
-    // Constructor vacío
     public PedidoCompletoRequest() {}
 
 

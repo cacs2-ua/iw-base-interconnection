@@ -15,11 +15,9 @@
 </div>
 
 <div>
-    <!-- FORM que hace un GET a /tienda/pagoFormProxy con todos los datos en QueryParams -->
     <form th:action="@{/tienda/pagoFormProxy}"
           method="get">
 
-        <!-- Campos ocultos para que viajen en Query Params -->
         <input type="hidden" name="ticket" th:value="${ticket}" />
         <input type="hidden" name="precio" th:value="${precio}" />
         <input type="hidden" name="nombreComercio" th:value="${nombreComercio}" />

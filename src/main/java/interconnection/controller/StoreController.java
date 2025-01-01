@@ -149,9 +149,6 @@ public class StoreController {
         }
     }
 
-    // ======================================================
-    // NUEVO: procesar la respuesta con "ERROR|" o "OK|"
-    // ======================================================
     @PostMapping("/realizarPagoProxy")
     public String realizarPagoProxy(@ModelAttribute PagoCompletoForm form, Model model) {
 
@@ -162,7 +159,6 @@ public class StoreController {
         }
         String apiKey = apiKeyOpt.get();
 
-        // Construimos request
         TarjetaPagoData tarjetaData = new TarjetaPagoData();
         tarjetaData.setNombre(form.getNombre());
         tarjetaData.setNumeroTarjeta(form.getNumeroTarjeta());
@@ -185,11 +181,9 @@ public class StoreController {
         String urlTPVV = "http://localhost:8123/tpvv/boardalo/pago/realizar";
 
         try {
-            // RestTemplate con configuración por defecto => no hay error si es 200
+
             ResponseEntity<String> response = restTemplate.postForEntity(urlTPVV, requestEntity, String.class);
 
-            // Partes NUEVAS:
-            // Examinamos el body para ver si empieza con "ERROR|" o "OK|"
             String body = response.getBody() != null ? response.getBody() : "";
 
             if (body.startsWith("ERROR|")) {
