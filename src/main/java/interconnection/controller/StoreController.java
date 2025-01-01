@@ -15,7 +15,7 @@ import interconnection.dto.PedidoCompletoRequest;
 import interconnection.dto.PagoData;
 import interconnection.dto.TarjetaPagoData;
 
-import java.net.URLEncoder;  // NUEVO IMPORT
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -58,17 +58,13 @@ public class StoreController {
         return "checkout";
     }
 
-    // ======================================================
-    // Muestra el formulario del TPVV embebido (proxy),
-    // e inyecta los errores si llegan como parámetro "errors"
-    // ======================================================
     @GetMapping("/pagoFormProxy")
     public String pagoFormProxy(@RequestParam("ticket") String ticket,
                                 @RequestParam("precio") double precio,
                                 @RequestParam("nombreComercio") String nombreComercio,
                                 @RequestParam("fecha") String fecha,
                                 @RequestParam("hora") String hora,
-                                @RequestParam(name="errors", required=false) String errors, // NUEVO
+                                @RequestParam(name="errors", required=false) String errors,
                                 Model model) {
 
         Optional<String> apiKeyOpt = parametroComercioService.getValorParametro("apiKey");
@@ -78,7 +74,7 @@ public class StoreController {
         }
         String apiKey = apiKeyOpt.get();
 
-        // NUEVO: Si existen errores, los añadimos al modelo para mostrarlos en la vista
+        // Si hay errores en la query param, los mostramos
         if (errors != null && !errors.isBlank()) {
             model.addAttribute("errorMessages", errors);
         }
@@ -92,18 +88,19 @@ public class StoreController {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> response =
+                    restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 String originalHtml = response.getBody();
 
-                // Modificamos el <form> para que apunte a nuestro Proxy
+                // Ajustamos el <form> para que apunte a nuestro /tienda/realizarPagoProxy
                 String modificadoHtml = originalHtml.replace(
                         "<form class=\"card-form\">",
                         "<form class=\"card-form\" method=\"post\" action=\"/tienda/realizarPagoProxy\">"
                 );
 
-                // Añadir name="..." en los inputs
+                // Añadimos los atributos name="..." a los inputs
                 modificadoHtml = modificadoHtml.replace(
                         "<input type=\"text\" class=\"card-input\" placeholder=\"Nombre Completo\">",
                         "<input type=\"text\" class=\"card-input\" name=\"nombre\" placeholder=\"Nombre Completo\">"
@@ -121,7 +118,7 @@ public class StoreController {
                         "<input type=\"text\" class=\"card-input security-code\" name=\"cvc\" placeholder=\"***\">"
                 );
 
-                // Añadir campos ocultos para Importe, Ticket, Fecha+Hora
+                // Campos ocultos para Importe, Ticket, Fecha+Hora
                 String hiddenFields = ""
                         + "<input type=\"hidden\" name=\"importe\" value=\"" + precio + "\"/>"
                         + "<input type=\"hidden\" name=\"ticketExt\" value=\"" + ticket + "\"/>"
@@ -129,7 +126,7 @@ public class StoreController {
 
                 modificadoHtml = modificadoHtml.replace("</form>", hiddenFields + "</form>");
 
-                // Reemplazar textos fijos en el HTML (importe, comercio, ticket, fecha, hora)
+                // Ajustar texto en el HTML
                 String precioFormateado = String.format("%.2f", precio);
                 modificadoHtml = modificadoHtml
                         .replace("218,42 €", precioFormateado + " €")
@@ -145,6 +142,7 @@ public class StoreController {
                 model.addAttribute("error", "Error al obtener el formulario de pago del TPVV.");
                 return "error/404";
             }
+
         } catch (Exception e) {
             model.addAttribute("error", "Excepción al llamar al TPVV: " + e.getMessage());
             return "error/404";
@@ -152,9 +150,7 @@ public class StoreController {
     }
 
     // ======================================================
-    // MODIFICADO:
-    // Maneja la respuesta del TPVV (200 OK o 400 BAD_REQUEST)
-    // Si es 400, redirigimos a pagoFormProxy con los mismos datos + errores
+    // NUEVO: procesar la respuesta con "ERROR|" o "OK|"
     // ======================================================
     @PostMapping("/realizarPagoProxy")
     public String realizarPagoProxy(@ModelAttribute PagoCompletoForm form, Model model) {
@@ -166,23 +162,20 @@ public class StoreController {
         }
         String apiKey = apiKeyOpt.get();
 
-        // TarjetaPagoData
+        // Construimos request
         TarjetaPagoData tarjetaData = new TarjetaPagoData();
         tarjetaData.setNombre(form.getNombre());
         tarjetaData.setNumeroTarjeta(form.getNumeroTarjeta());
         tarjetaData.setCvc(form.getCvc());
         tarjetaData.setFechaCaducidad(form.getCaducidad());
 
-        // PagoData
         PagoData pagoData = new PagoData();
         pagoData.setImporte(form.getImporte());
         pagoData.setTicketExt(form.getTicketExt());
         pagoData.setFecha(form.getFecha());
 
-        // Construimos la request
         PagoCompletoRequest requestBody = new PagoCompletoRequest(pagoData, tarjetaData);
 
-        // Cabecera con la API Key
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", apiKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -192,42 +185,37 @@ public class StoreController {
         String urlTPVV = "http://localhost:8123/tpvv/boardalo/pago/realizar";
 
         try {
-            ResponseEntity<String> response =
-                    restTemplate.postForEntity(urlTPVV, requestEntity, String.class);
+            // RestTemplate con configuración por defecto => no hay error si es 200
+            ResponseEntity<String> response = restTemplate.postForEntity(urlTPVV, requestEntity, String.class);
 
-            // ================================
-            // MODIFICADO: Manejo del status
-            // ================================
-            if (response.getStatusCode() == HttpStatus.OK) {
-                // Éxito
-                String msg = response.getBody();
-                model.addAttribute("msgOk", msg);
-                return "pagoOk";
+            // Partes NUEVAS:
+            // Examinamos el body para ver si empieza con "ERROR|" o "OK|"
+            String body = response.getBody() != null ? response.getBody() : "";
 
-            } else if (response.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                // Hubo errores de validación en el TPVV
-                // El body contiene el texto de errores
-                String erroresTPVV = response.getBody() != null ? response.getBody() : "Error desconocido";
+            if (body.startsWith("ERROR|")) {
+                // Tomamos el substring después de "ERROR|" como mensaje
+                String erroresTPVV = body.substring("ERROR|".length()).trim();
 
-                // Construimos la redirección al GET /tienda/pagoFormProxy
-                // con los parámetros principales (ticket, precio, etc.) y con "errors"
-                // OJO: Usamos URLEncoder para el mensaje de error
+                // Redirigir a pagoFormProxy con ?errors=...
                 String redirectUrl = "redirect:/tienda/pagoFormProxy?ticket="
                         + urlEncode(form.getTicketExt())
                         + "&precio=" + urlEncode(form.getImporte())
-                        + "&nombreComercio=" + urlEncode("Tienda Online v2") // O lo que corresponda
+                        + "&nombreComercio=" + urlEncode("Tienda Online v2")
                         + "&fecha=" + urlEncode(extraerSoloFecha(form.getFecha()))
                         + "&hora=" + urlEncode(extraerSoloHora(form.getFecha()))
                         + "&errors=" + urlEncode(erroresTPVV);
 
                 return redirectUrl;
 
-            } else if (response.getStatusCode().is3xxRedirection()) {
-                model.addAttribute("error", "Redirección 3xx recibida, revise su configuración.");
-                return "error/404";
+            } else if (body.startsWith("OK|")) {
+                // Éxito
+                String msgOk = body.substring("OK|".length()).trim();
+                model.addAttribute("msgOk", msgOk);
+                return "pagoOk";
 
             } else {
-                model.addAttribute("error", "Error en respuesta TPVV: " + response.getStatusCode());
+                // Body desconocido => error
+                model.addAttribute("error", "Respuesta desconocida del TPVV: " + body);
                 return "error/404";
             }
 
@@ -250,25 +238,19 @@ public class StoreController {
     }
 
     // ===========================================================
-    // NUEVO: Métodos auxiliares para formatear fecha y encode
+    // Métodos auxiliares para formatear fecha y encode
     // ===========================================================
     private String urlEncode(String raw) {
         if (raw == null) return "";
         return URLEncoder.encode(raw, StandardCharsets.UTF_8);
     }
 
-    /**
-     * Intenta extraer la parte de fecha (ej: "dd/MM/yyyy") de un string "dd/MM/yyyy HH:mm"
-     */
     private String extraerSoloFecha(String fechaCompleta) {
         if (fechaCompleta == null) return "";
         String[] partes = fechaCompleta.split(" ");
         return (partes.length > 0) ? partes[0] : "";
     }
 
-    /**
-     * Intenta extraer la parte de hora (ej: "HH:mm") de un string "dd/MM/yyyy HH:mm"
-     */
     private String extraerSoloHora(String fechaCompleta) {
         if (fechaCompleta == null) return "";
         String[] partes = fechaCompleta.split(" ");
