@@ -122,8 +122,8 @@ public class StoreController {
                         "<input type=\"text\" class=\"card-input expiry-date\" name=\"caducidad\" placeholder=\"mm/aa\">"
                 );
                 modificadoHtml = modificadoHtml.replace(
-                        "<input type=\"text\" class=\"card-input security-code\" placeholder=\"***\">",
-                        "<input type=\"text\" class=\"card-input security-code\" name=\"cvc\" placeholder=\"***\">"
+                        "<input type=\"password\" class=\"card-input security-code\" placeholder=\"***\">",
+                        "<input type=\"password\" class=\"card-input security-code\" name=\"cvc\" placeholder=\"***\">"
                 );
 
                 // Campos ocultos para Importe, Ticket, Fecha+Hora
