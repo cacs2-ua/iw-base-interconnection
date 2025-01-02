@@ -6,10 +6,8 @@ public class PagoData {
     private Long id;
     private String ticketExt;
 
-    // MODIFICADO: Antes era Date, ahora String
     private String fecha;
 
-    // MODIFICADO: Antes era double, ahora String
     private String importe;
 
     private String tarjeta;
@@ -17,10 +15,8 @@ public class PagoData {
     private String comercioNombre;
     private String tarjetaPagoNumero;
 
-    // Constructor vacío
     public PagoData() {}
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -35,7 +31,6 @@ public class PagoData {
         this.ticketExt = ticketExt;
     }
 
-    // MODIFICADO: Getter/Setter fecha como String
     public String getFecha() {
         return fecha;
     }
@@ -43,7 +38,6 @@ public class PagoData {
         this.fecha = fecha;
     }
 
-    // MODIFICADO: Getter/Setter importe como String
     public String getImporte() {
         return importe;
     }

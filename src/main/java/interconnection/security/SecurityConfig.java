@@ -13,9 +13,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private ApiKeyAuthFilter apiKeyAuthFilter;
-
     @Bean
     public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
         http
@@ -27,7 +24,6 @@ public class SecurityConfig {
                         .requestMatchers("/pago/**").authenticated() // Requiere autenticación para los endpoints de pago
                         .anyRequest().permitAll() // Permitir acceso al resto de rutas
                 )
-                .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

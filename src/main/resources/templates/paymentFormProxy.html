@@ -5,7 +5,14 @@
   <meta charset="UTF-8" />
 </head>
 <body>
-<!-- Inyectamos el HTML devuelto por el TPVV -->
+
+<div th:if="${errorMessages != null}">
+  <h3 style="color:red" th:text="'Errores en los datos introducidos: ' + ${errorMessages}"></h3>
+</div>
+
 <div th:utext="${paymentFormContent}"></div>
+
+<a href="/tienda/checkout">Volver a la información del pedido</a>
+
 </body>
 </html>

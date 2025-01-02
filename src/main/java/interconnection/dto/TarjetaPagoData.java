@@ -7,10 +7,8 @@ public class TarjetaPagoData {
     private Long id;
     private String numeroTarjeta;
 
-    // MODIFICADO: Antes era int
     private String cvc;
 
-    // MODIFICADO: Antes era Date
     private String fechaCaducidad;
 
     private String nombre;
@@ -31,7 +29,6 @@ public class TarjetaPagoData {
         this.numeroTarjeta = numeroTarjeta;
     }
 
-    // MODIFICADO: cvc como String
     public String getCvc() {
         return cvc;
     }
@@ -40,7 +37,6 @@ public class TarjetaPagoData {
         this.cvc = cvc;
     }
 
-    // MODIFICADO: fechaCaducidad como String
     public String getFechaCaducidad() {
         return fechaCaducidad;
     }
@@ -57,7 +53,6 @@ public class TarjetaPagoData {
         this.nombre = nombre;
     }
 
-    // equals, hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
