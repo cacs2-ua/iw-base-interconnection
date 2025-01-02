@@ -209,8 +209,24 @@ public class StoreController {
 
                 return redirectUrl;
 
-            } else if (body.startsWith("OK|")) {
-                // Éxito
+            }
+
+            else if (body.startsWith("RECH|")) {
+                // Pago Rechazado
+                String msgRech = body.substring("RECH|".length()).trim();
+                model.addAttribute("msgRech", msgRech);
+                return "pagoRech";
+            }
+
+            else if (body.startsWith("PEND|")) {
+                // Pago Pendiente
+                String msgPend = body.substring("PEND|".length()).trim();
+                model.addAttribute("msgPend", msgPend);
+                return "pagoPend";
+            }
+
+            else if (body.startsWith("OK|")) {
+                // Pago Aceptado Correctamente
                 String msgOk = body.substring("OK|".length()).trim();
                 model.addAttribute("msgOk", msgOk);
                 return "pagoOk";

@@ -20,6 +20,7 @@ public class PedidoCompletoRequest {
     private String importe;
 
     private String estadoPago;
+    public String razonEstadoPago;
     private String comercioNombre;
     private String numeroTarjeta;
 
@@ -99,6 +100,14 @@ public class PedidoCompletoRequest {
 
     public void setEstadoPago(String estadoPago) {
         this.estadoPago = estadoPago;
+    }
+
+    public String getRazonEstadoPago() {
+        return razonEstadoPago;
+    }
+
+    public void setRazonEstadoPago(String razonEstadoPago) {
+        this.razonEstadoPago = razonEstadoPago;
     }
 
     public String getComercioNombre() {
