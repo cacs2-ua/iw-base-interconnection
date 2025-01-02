@@ -1,13 +1,8 @@
 package interconnection.controller;
 
 import interconnection.dto.PagoCompletoForm;
-import interconnection.model.Pago;
-import interconnection.model.PedidoCompletado;
-import interconnection.repository.PagoRepository;
-import interconnection.repository.PedidoCompletadoRepository;
 import interconnection.service.PagoService;
 import interconnection.service.ParametroComercioService;
-import interconnection.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -39,14 +34,13 @@ public class StoreController {
     private RestTemplate restTemplate;
 
     @Autowired
-    private PedidoService pedidoService;
-
-    @Autowired
     private PagoService pagoService;
-    @Autowired
-    private PagoRepository pagoRepository;
-    @Autowired
-    private PedidoCompletadoRepository pedidoCompletadoRepository;
+
+    @GetMapping("/")
+    public String home(Model model) {
+        return "redirect:/tienda/checkout";
+    }
+
 
     @GetMapping("/checkout")
     public String mostrarCheckout(Model model) {

@@ -1,10 +1,7 @@
 package interconnection.service;
 
 import interconnection.dto.PedidoCompletoRequest;
-import interconnection.model.Comercio;
-import interconnection.model.Pago;
 import interconnection.model.PedidoCompletado;
-import interconnection.repository.PagoRepository;
 import interconnection.repository.PedidoCompletadoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,36 +9,16 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 public class PagoService {
 
-    @Autowired
-    private PagoRepository pagoRepository;
+
 
     @Autowired
     private PedidoCompletadoRepository pedidoCompletadoRepository;
 
-    /**
-     * Realiza un pago con los detalles proporcionados.
-     */
-    public Pago realizarPago(Comercio comercio, double importe, String ticketId, String tarjeta) {
-        Pago pago = new Pago();
-        pago.setComercio(comercio);
-        pago.setImporte(importe);
-        pago.setTicketExt(ticketId);
-        pago.setFecha(new Date());
-        pago.setTarjeta(tarjeta);
-        return pagoRepository.save(pago);
-    }
 
-    /**
-     * Obtiene un pago por su ID.
-     */
-    public Optional<Pago> getPagoById(Long id) {
-        return pagoRepository.findById(id);
-    }
 
     /**
      * Procesa el PedidoCompletoRequest que llega desde el TPVV (servidor).
